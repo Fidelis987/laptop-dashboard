@@ -10,9 +10,17 @@
   body {
     font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
     background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    background-size: 400% 400%;
+    animation: bgShift 18s ease infinite;
     min-height: 100vh;
     padding: 24px;
     color: #2c3e50;
+  }
+
+  @keyframes bgShift {
+    0%   { background-position:   0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position:   0% 50%; }
   }
 
   .dashboard {
@@ -20,6 +28,13 @@
     margin: 0 auto;
   }
 
+  /* ENTRY ANIMATION - elements rise & fade in */
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(28px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* HEADER */
   .header {
     background: rgba(255, 255, 255, 0.95);
     border-radius: 16px;
@@ -31,12 +46,23 @@
     align-items: center;
     flex-wrap: wrap;
     gap: 16px;
+    opacity: 0;
+    animation: fadeInUp 0.7s ease-out 0.1s forwards;
   }
 
   .header h1 {
     font-size: 28px;
-    color: #1e3c72;
     font-weight: 700;
+    background: linear-gradient(90deg, #1e3c72, #4a90e2, #1e3c72);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shine 4s linear infinite;
+  }
+
+  @keyframes shine {
+    to { background-position: 200% center; }
   }
 
   .header .subtitle {
@@ -66,20 +92,42 @@
     border-radius: 14px;
     padding: 24px;
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s, box-shadow 0.2s;
+    transition: transform 0.3s cubic-bezier(.2,.8,.2,1), box-shadow 0.3s;
     border-left: 5px solid;
+    opacity: 0;
+    animation: fadeInUp 0.6s ease-out forwards;
+    position: relative;
+    overflow: hidden;
   }
+
+  .kpi-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -75%;
+    width: 50%; height: 100%;
+    background: linear-gradient(120deg, transparent, rgba(255,255,255,.6), transparent);
+    transform: skewX(-20deg);
+    transition: left 0.7s ease;
+    pointer-events: none;
+  }
+  .kpi-card:hover::before { left: 125%; }
 
   .kpi-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18);
+    transform: translateY(-6px) scale(1.02);
+    box-shadow: 0 18px 36px rgba(0, 0, 0, 0.22);
   }
 
-  .kpi-card.total { border-left-color: #3498db; }
+  .kpi-card:nth-child(1) { animation-delay: 0.20s; }
+  .kpi-card:nth-child(2) { animation-delay: 0.30s; }
+  .kpi-card:nth-child(3) { animation-delay: 0.40s; }
+  .kpi-card:nth-child(4) { animation-delay: 0.50s; }
+  .kpi-card:nth-child(5) { animation-delay: 0.60s; }
+
+  .kpi-card.total  { border-left-color: #3498db; }
   .kpi-card.lenovo { border-left-color: #e74c3c; }
-  .kpi-card.dell { border-left-color: #1abc9c; }
-  .kpi-card.hp { border-left-color: #f39c12; }
-  .kpi-card.apple { border-left-color: #9b59b6; }
+  .kpi-card.dell   { border-left-color: #1abc9c; }
+  .kpi-card.hp     { border-left-color: #f39c12; }
+  .kpi-card.apple  { border-left-color: #9b59b6; }
 
   .kpi-label {
     font-size: 13px;
@@ -93,6 +141,7 @@
     font-size: 36px;
     font-weight: 800;
     color: #2c3e50;
+    font-variant-numeric: tabular-nums;
   }
 
   .kpi-pct {
@@ -114,7 +163,21 @@
     border-radius: 14px;
     padding: 28px;
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+    opacity: 0;
+    animation: fadeInUp 0.7s ease-out forwards;
+    transition: transform 0.3s, box-shadow 0.3s;
   }
+
+  .panel:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.18);
+  }
+
+  .panel-grid .panel:nth-child(1) { animation-delay: 0.70s; }
+  .panel-grid .panel:nth-child(2) { animation-delay: 0.85s; }
+  .panel-grid .panel:nth-child(3) { animation-delay: 1.00s; }
+  .panel-grid .panel:nth-child(4) { animation-delay: 1.15s; }
+  .matrix-panel { animation-delay: 1.30s; }
 
   .panel h2 {
     font-size: 18px;
@@ -147,6 +210,7 @@
     position: relative;
   }
 
+  /* Bar fill: width grows from 0 to --w via animation */
   .bar-fill {
     height: 100%;
     border-radius: 6px;
@@ -156,7 +220,31 @@
     color: white;
     font-weight: 600;
     font-size: 13px;
-    transition: width 1s ease-out;
+    width: 0;
+    animation: barGrow 1.4s cubic-bezier(.16,.84,.24,1) forwards;
+    animation-delay: 1.0s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .bar-fill::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,.35) 50%, transparent 100%);
+    transform: translateX(-100%);
+    animation: shimmer 3.2s ease-in-out infinite;
+    animation-delay: 2.6s;
+  }
+
+  @keyframes shimmer {
+    0%   { transform: translateX(-100%); }
+    60%  { transform: translateX(180%); }
+    100% { transform: translateX(180%); }
+  }
+
+  @keyframes barGrow {
+    to { width: var(--w); }
   }
 
   .bar-value {
@@ -164,6 +252,9 @@
     font-weight: 700;
     color: #34495e;
     font-size: 14px;
+    opacity: 0;
+    animation: fadeInUp 0.5s ease-out forwards;
+    animation-delay: 2.0s;
   }
 
   .lenovo-bar { background: linear-gradient(90deg, #e74c3c, #c0392b); }
@@ -187,11 +278,35 @@
     justify-content: center;
   }
 
-  .donut {
+  .donut-wrap {
     width: 220px;
     height: 220px;
     position: relative;
+    transform: rotate(-180deg) scale(0.6);
+    opacity: 0;
+    animation: donutSpinIn 1.4s cubic-bezier(.2,.7,.3,1) forwards;
+    animation-delay: 1.0s;
   }
+
+  @keyframes donutSpinIn {
+    to { transform: rotate(0) scale(1); opacity: 1; }
+  }
+
+  .donut {
+    width: 220px;
+    height: 220px;
+    background: conic-gradient(
+      #e74c3c 0 173deg,
+      #1abc9c 173deg 343deg,
+      #f39c12 343deg 357.6deg,
+      #9b59b6 357.6deg 360deg
+    );
+    border-radius: 50%;
+    -webkit-mask: radial-gradient(circle, transparent 60px, black 61px);
+            mask: radial-gradient(circle, transparent 60px, black 61px);
+    transition: transform 0.4s ease;
+  }
+  .donut-wrap:hover .donut { transform: rotate(8deg) scale(1.04); }
 
   .donut-center {
     position: absolute;
@@ -199,9 +314,15 @@
     left: 50%;
     transform: translate(-50%, -50%);
     text-align: center;
+    pointer-events: none;
   }
 
-  .donut-center .num { font-size: 32px; font-weight: 800; color: #2c3e50; }
+  .donut-center .num {
+    font-size: 32px;
+    font-weight: 800;
+    color: #2c3e50;
+    font-variant-numeric: tabular-nums;
+  }
   .donut-center .lbl { font-size: 12px; color: #7f8c8d; text-transform: uppercase; letter-spacing: 1px; }
 
   .legend {
@@ -214,13 +335,21 @@
     gap: 10px;
     margin-bottom: 10px;
     font-size: 14px;
+    opacity: 0;
+    animation: fadeInUp 0.4s ease-out forwards;
   }
+  .legend li:nth-child(1) { animation-delay: 1.6s; }
+  .legend li:nth-child(2) { animation-delay: 1.7s; }
+  .legend li:nth-child(3) { animation-delay: 1.8s; }
+  .legend li:nth-child(4) { animation-delay: 1.9s; }
 
   .legend .swatch {
     width: 14px;
     height: 14px;
     border-radius: 3px;
+    transition: transform 0.2s;
   }
+  .legend li:hover .swatch { transform: scale(1.4) rotate(8deg); }
 
   .legend .name { font-weight: 600; min-width: 80px; }
   .legend .count { color: #7f8c8d; }
@@ -237,6 +366,7 @@
     padding: 12px 10px;
     text-align: center;
     border-bottom: 1px solid #ecf0f1;
+    transition: background 0.25s, transform 0.25s;
   }
 
   table.matrix th {
@@ -255,22 +385,50 @@
     color: #2c3e50;
   }
 
+  table.matrix tbody tr {
+    opacity: 0;
+    animation: fadeInUp 0.5s ease-out forwards;
+  }
+  table.matrix tbody tr:nth-child(1) { animation-delay: 1.4s; }
+  table.matrix tbody tr:nth-child(2) { animation-delay: 1.5s; }
+  table.matrix tbody tr:nth-child(3) { animation-delay: 1.6s; }
+  table.matrix tbody tr:nth-child(4) { animation-delay: 1.7s; }
+  table.matrix tbody tr:nth-child(5) { animation-delay: 1.8s; }
+
+  table.matrix tbody tr:hover td { background: #f0f7ff; }
+
   table.matrix tr:last-child {
     background: #f8f9fa;
     font-weight: 700;
   }
 
-  table.matrix .heat-low    { background: #f8f9fa; }
-  table.matrix .heat-1      { background: #e3f2fd; }
-  table.matrix .heat-2      { background: #90caf9; color: white; }
-  table.matrix .heat-3      { background: #1976d2; color: white; }
-  table.matrix .heat-4      { background: #0d47a1; color: white; }
+  table.matrix .heat-low { background: #f8f9fa; }
+  table.matrix .heat-1   { background: #e3f2fd; }
+  table.matrix .heat-2   { background: #90caf9; color: white; }
+  table.matrix .heat-3   { background: #1976d2; color: white; }
+  table.matrix .heat-4   { background: #0d47a1; color: white; animation: pulse 2.4s ease-in-out infinite; }
+
+  @keyframes pulse {
+    0%, 100% { box-shadow: inset 0 0 0 0 rgba(255,255,255,0); }
+    50%      { box-shadow: inset 0 0 30px 0 rgba(255,255,255,.3); }
+  }
 
   .footer {
     text-align: center;
     color: rgba(255, 255, 255, 0.85);
     font-size: 13px;
     padding: 16px;
+    opacity: 0;
+    animation: fadeInUp 0.6s ease-out 1.8s forwards;
+  }
+
+  /* Reduce motion for accessibility */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
   }
 
   @media (max-width: 720px) {
@@ -297,27 +455,27 @@
   <div class="kpi-grid">
     <div class="kpi-card total">
       <div class="kpi-label">Total Laptops</div>
-      <div class="kpi-value">316</div>
+      <div class="kpi-value" data-target="316">0</div>
       <div class="kpi-pct">100% of fleet</div>
     </div>
     <div class="kpi-card lenovo">
       <div class="kpi-label">Lenovo</div>
-      <div class="kpi-value">152</div>
+      <div class="kpi-value" data-target="152">0</div>
       <div class="kpi-pct">48.1%</div>
     </div>
     <div class="kpi-card dell">
       <div class="kpi-label">Dell</div>
-      <div class="kpi-value">149</div>
+      <div class="kpi-value" data-target="149">0</div>
       <div class="kpi-pct">47.2%</div>
     </div>
     <div class="kpi-card hp">
       <div class="kpi-label">HP</div>
-      <div class="kpi-value">13</div>
+      <div class="kpi-value" data-target="13">0</div>
       <div class="kpi-pct">4.1%</div>
     </div>
     <div class="kpi-card apple">
       <div class="kpi-label">Apple</div>
-      <div class="kpi-value">1</div>
+      <div class="kpi-value" data-target="1">0</div>
       <div class="kpi-pct">0.3%</div>
     </div>
   </div>
@@ -330,22 +488,22 @@
       <h2>Laptops by Brand</h2>
       <div class="bar-row">
         <div class="bar-label">Lenovo</div>
-        <div class="bar-track"><div class="bar-fill lenovo-bar" style="width: 100%;">152</div></div>
+        <div class="bar-track"><div class="bar-fill lenovo-bar" style="--w: 100%;">152</div></div>
         <div class="bar-value">48.1%</div>
       </div>
       <div class="bar-row">
         <div class="bar-label">Dell</div>
-        <div class="bar-track"><div class="bar-fill dell-bar" style="width: 98%;">149</div></div>
+        <div class="bar-track"><div class="bar-fill dell-bar" style="--w: 98%;">149</div></div>
         <div class="bar-value">47.2%</div>
       </div>
       <div class="bar-row">
         <div class="bar-label">HP</div>
-        <div class="bar-track"><div class="bar-fill hp-bar" style="width: 8.6%;">13</div></div>
+        <div class="bar-track"><div class="bar-fill hp-bar" style="--w: 8.6%;">13</div></div>
         <div class="bar-value">4.1%</div>
       </div>
       <div class="bar-row">
         <div class="bar-label">Apple</div>
-        <div class="bar-track"><div class="bar-fill apple-bar" style="width: 0.7%;">1</div></div>
+        <div class="bar-track"><div class="bar-fill apple-bar" style="--w: 0.7%;">1</div></div>
         <div class="bar-value">0.3%</div>
       </div>
     </div>
@@ -354,18 +512,10 @@
     <div class="panel">
       <h2>Brand Share</h2>
       <div class="donut-container">
-        <div class="donut" style="background:
-          conic-gradient(
-            #e74c3c 0 173deg,
-            #1abc9c 173deg 343deg,
-            #f39c12 343deg 357.6deg,
-            #9b59b6 357.6deg 360deg
-          );
-          border-radius: 50%;
-          mask: radial-gradient(circle, transparent 60px, black 61px);
-          -webkit-mask: radial-gradient(circle, transparent 60px, black 61px);">
+        <div class="donut-wrap">
+          <div class="donut"></div>
           <div class="donut-center">
-            <div class="num">316</div>
+            <div class="num" data-target="316">0</div>
             <div class="lbl">Total</div>
           </div>
         </div>
@@ -383,27 +533,27 @@
       <h2>RAM Capacity Distribution</h2>
       <div class="bar-row">
         <div class="bar-label">8 GB</div>
-        <div class="bar-track"><div class="bar-fill ram-8" style="width: 96%;">120</div></div>
+        <div class="bar-track"><div class="bar-fill ram-8" style="--w: 96%;">120</div></div>
         <div class="bar-value">38.0%</div>
       </div>
       <div class="bar-row">
         <div class="bar-label">16 GB</div>
-        <div class="bar-track"><div class="bar-fill ram-16" style="width: 48.8%;">61</div></div>
+        <div class="bar-track"><div class="bar-fill ram-16" style="--w: 48.8%;">61</div></div>
         <div class="bar-value">19.3%</div>
       </div>
       <div class="bar-row">
         <div class="bar-label">32 GB</div>
-        <div class="bar-track"><div class="bar-fill ram-32" style="width: 6.4%;">8</div></div>
+        <div class="bar-track"><div class="bar-fill ram-32" style="--w: 6.4%;">8</div></div>
         <div class="bar-value">2.5%</div>
       </div>
       <div class="bar-row">
         <div class="bar-label">4 GB</div>
-        <div class="bar-track"><div class="bar-fill ram-4" style="width: 1.6%;">2</div></div>
+        <div class="bar-track"><div class="bar-fill ram-4" style="--w: 1.6%;">2</div></div>
         <div class="bar-value">0.6%</div>
       </div>
       <div class="bar-row">
         <div class="bar-label">Not spec.</div>
-        <div class="bar-track"><div class="bar-fill ram-na" style="width: 100%;">125</div></div>
+        <div class="bar-track"><div class="bar-fill ram-na" style="--w: 100%;">125</div></div>
         <div class="bar-value">39.6%</div>
       </div>
     </div>
@@ -413,27 +563,27 @@
       <h2>Status Breakdown</h2>
       <div class="bar-row">
         <div class="bar-label">In Use</div>
-        <div class="bar-track"><div class="bar-fill" style="width: 100%; background: linear-gradient(90deg, #3498db, #2980b9);">170</div></div>
+        <div class="bar-track"><div class="bar-fill" style="--w: 100%; background: linear-gradient(90deg, #3498db, #2980b9);">170</div></div>
         <div class="bar-value">53.8%</div>
       </div>
       <div class="bar-row">
         <div class="bar-label">Assigned</div>
-        <div class="bar-track"><div class="bar-fill" style="width: 71.8%; background: linear-gradient(90deg, #2ecc71, #27ae60);">122</div></div>
+        <div class="bar-track"><div class="bar-fill" style="--w: 71.8%; background: linear-gradient(90deg, #2ecc71, #27ae60);">122</div></div>
         <div class="bar-value">38.6%</div>
       </div>
       <div class="bar-row">
         <div class="bar-label">Returned</div>
-        <div class="bar-track"><div class="bar-fill" style="width: 11.2%; background: linear-gradient(90deg, #f1c40f, #f39c12);">19</div></div>
+        <div class="bar-track"><div class="bar-fill" style="--w: 11.2%; background: linear-gradient(90deg, #f1c40f, #f39c12);">19</div></div>
         <div class="bar-value">6.0%</div>
       </div>
       <div class="bar-row">
         <div class="bar-label">Faulty</div>
-        <div class="bar-track"><div class="bar-fill" style="width: 2.4%; background: linear-gradient(90deg, #e67e22, #d35400);">4</div></div>
+        <div class="bar-track"><div class="bar-fill" style="--w: 2.4%; background: linear-gradient(90deg, #e67e22, #d35400);">4</div></div>
         <div class="bar-value">1.3%</div>
       </div>
       <div class="bar-row">
         <div class="bar-label">Repair</div>
-        <div class="bar-track"><div class="bar-fill" style="width: 0.6%; background: linear-gradient(90deg, #e74c3c, #c0392b);">1</div></div>
+        <div class="bar-track"><div class="bar-fill" style="--w: 0.6%; background: linear-gradient(90deg, #e74c3c, #c0392b);">1</div></div>
         <div class="bar-value">0.3%</div>
       </div>
     </div>
@@ -441,7 +591,7 @@
   </div>
 
   <!-- BRAND x RAM MATRIX -->
-  <div class="panel">
+  <div class="panel matrix-panel">
     <h2>Brand &times; RAM Capacity Matrix</h2>
     <table class="matrix">
       <thead>
@@ -510,6 +660,27 @@
   </div>
 
 </div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    document.querySelectorAll('[data-target]').forEach(el => {
+      const target = parseInt(el.dataset.target, 10);
+      if (reduceMotion) { el.textContent = target; return; }
+      const duration = 1600;
+      const startDelay = 200;
+      const start = performance.now() + startDelay;
+      const ease = t => 1 - Math.pow(1 - t, 3);
+      const tick = (now) => {
+        if (now < start) { requestAnimationFrame(tick); return; }
+        const t = Math.min(1, (now - start) / duration);
+        el.textContent = Math.round(ease(t) * target);
+        if (t < 1) requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    });
+  });
+</script>
 
 </body>
 </html>
